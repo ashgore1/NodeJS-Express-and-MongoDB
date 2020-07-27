@@ -1,22 +1,22 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const Favorite = require("../models/favorite");
+const Partner = require("../models/partner");
 const authenticate = require("../authenticate");
 const cors = require("./cors");
 
-const favoriteRouter = express.Router();
+const partnerRouter = express.Router();
 
-favoriteRouter.use(bodyParser.json());
+partnerRouter.use(bodyParser.json());
 
-favoriteRouter
+partnerRouter
   .route("/")
   .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
   .get(cors.cors, (req, res, next) => {
-    favorite.find()
-      .then((favorites) => {
+    Partner.find()
+      .then((partners) => {
         res.statusCode = 200;
         res.setHeader("Content-Type", "application/json");
-        res.json(favorites);
+        res.json(partners);
       })
       .catch((err) => next(err));
   })
@@ -25,26 +25,26 @@ favoriteRouter
     authenticate.verifyUser,
     authenticate.verifyAdmin,
     (req, res, next) => {
-      Favorite.create(req.body)
-        .then((favorite) => {
-          console.log("Favorite Created ", favorite);
+      Partner.create(req.body)
+        .then((partner) => {
+          console.log("Partner Created ", partner);
           res.statusCode = 200;
           res.setHeader("Content-Type", "application/json");
-          res.json(favorite);
+          res.json(partner);
         })
         .catch((err) => next(err));
     }
   )
   .put(cors.corsWithOptions, authenticate.verifyUser, (req, res) => {
     res.statusCode = 403;
-    res.end("PUT operation not supported on /favorites");
+    res.end("PUT operation not supported on /partners");
   })
   .delete(
     cors.corsWithOptions,
     authenticate.verifyUser,
     authenticate.verifyAdmin,
     (req, res, next) => {
-      Favorite.deleteMany()
+      Partner.deleteMany()
         .then((response) => {
           res.statusCode = 200;
           res.setHeader("Content-Type", "application/json");
@@ -54,22 +54,22 @@ favoriteRouter
     }
   );
 
-favoriteRouter
-  .route("/:favoriteId")
+partnerRouter
+  .route("/:partnerId")
   .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
   .get(cors.cors, (req, res, next) => {
-    Favorite.findById(req.params.favoriteId)
-      .then((favorite) => {
+    Partner.findById(req.params.partnerId)
+      .then((partner) => {
         res.statusCode = 200;
         res.setHeader("Content-Type", "application/json");
-        res.json(favorite);
+        res.json(partner);
       })
       .catch((err) => next(err));
   })
   .post(cors.corsWithOptions, authenticate.verifyUser, (req, res) => {
     res.statusCode = 403;
     res.end(
-      `POST operation not supported on /favorites/${req.params.favoriteId}`
+      `POST operation not supported on /partners/${req.params.partnerId}`
     );
   })
   .put(
@@ -77,17 +77,17 @@ favoriteRouter
     authenticate.verifyUser,
     authenticate.verifyAdmin,
     (req, res, next) => {
-      Favorite.findByIdAndUpdate(
-        req.params.favoriteId,
+      Partner.findByIdAndUpdate(
+        req.params.partnerId,
         {
           $set: req.body,
         },
         { new: true }
       )
-        .then((favorite) => {
+        .then((partner) => {
           res.statusCode = 200;
           res.setHeader("Content-Type", "application/json");
-          res.json(favorite);
+          res.json(partner);
         })
         .catch((err) => next(err));
     }
@@ -97,7 +97,7 @@ favoriteRouter
     authenticate.verifyUser,
     authenticate.verifyAdmin,
     (req, res, next) => {
-      Favorite.findByIdAndDelete(req.params.favoriteId)
+      Partner.findByIdAndDelete(req.params.partnerId)
         .then((response) => {
           res.statusCode = 200;
           res.setHeader("Content-Type", "application/json");
@@ -107,4 +107,4 @@ favoriteRouter
     }
   );
 
-module.exports = favoriteRouter;
+module.exports = partnerRouter;
